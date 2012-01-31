@@ -100,7 +100,6 @@ public class SnowTcpServer {
 		public <T> void Invoke(T item) throws IOException {
 			// Get the seleciton key for the current new connection
 			SelectionKey key = (SelectionKey)item;
-			
 			// If it's a good key
 			if (key.isAcceptable()) {
 				// Get the server channel

@@ -5,13 +5,14 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class SnowTcpClient {
 	
 	private SelectionKey selectionKey;
 	private SocketChannel socket;
 	private ArrayList<ByteBuffer> toWrite;
-	
+	private Date connectTime;
 	private String name;
 	
 	public SnowTcpClient(SelectionKey key) throws IOException {
@@ -19,6 +20,7 @@ public class SnowTcpClient {
 		this.socket = (SocketChannel)this.selectionKey.channel();
 		this.socket.configureBlocking(false);
 		toWrite = new ArrayList<ByteBuffer>();
+		connectTime = new Date();
 	}
 	
 	public SelectionKey GetSelectionKey() {
@@ -26,9 +28,8 @@ public class SnowTcpClient {
 	}
 	
 	public byte[] Read() throws IOException {
-		int nBytes = 0;
 		ByteBuffer buf = ByteBuffer.allocate(1024);
-		nBytes = socket.read(buf);
+		socket.read(buf);
 		return buf.array();
 	}
 	
@@ -59,4 +60,7 @@ public class SnowTcpClient {
 		return this.name;
 	}
 	
+	public Date getConnectionTime() {
+		return this.connectTime;
+	}
 }

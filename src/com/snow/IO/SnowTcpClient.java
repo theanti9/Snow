@@ -60,7 +60,7 @@ public class SnowTcpClient {
 		return this.name;
 	}
 	
-	public Date getConnectionTime() {
+	public Date GetConnectionTime() {
 		return this.connectTime;
 	}
 }

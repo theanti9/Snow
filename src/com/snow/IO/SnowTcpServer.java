@@ -47,7 +47,7 @@ public class SnowTcpServer {
 	}
 	
 	// Register event callbacks
-	public void RegisterCallback (IOConnectEventCallback callback) {
+	public void RegisterCallback(IOConnectEventCallback callback) {
 		connectCallback = callback;
 	}
 	

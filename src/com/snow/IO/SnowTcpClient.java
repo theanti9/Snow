@@ -13,7 +13,7 @@ public class SnowTcpClient {
 	private SocketChannel socket;
 	private ArrayList<ByteBuffer> toWrite;
 	private Date connectTime;
-	private String name;
+	private String name = null;
 	
 	public SnowTcpClient(SelectionKey key) throws IOException {
 		this.selectionKey = key;

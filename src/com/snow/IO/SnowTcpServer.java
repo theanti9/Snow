@@ -1,0 +1,131 @@
+package com.snow.IO;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
+import com.snow.IO.EventCallback.IOConnectEventCallback;
+import com.snow.IO.EventCallback.IODisconnectEventCallback;
+import com.snow.IO.EventCallback.IOReadEventCallback;
+import com.snow.parallel.IForEachCallback;
+import com.snow.parallel.ParallelLoop;
+
+public class SnowTcpServer {
+	
+	private ServerSocketChannel serverSockChannel;
+	private SocketChannel sockChannel;
+	private Selector selector;
+	
+	private static IOConnectEventCallback connectCallback = null;
+	private static IODisconnectEventCallback disconnectCallback = null;
+	private static IOReadEventCallback readCallback = null;
+	
+	private static HashMap<SelectionKey, SnowTcpClient> activeClients;
+	
+	private int port;
+	
+	public SnowTcpServer(int port) {
+		this.port = port;
+		activeClients = new HashMap<SelectionKey, SnowTcpClient>();
+	}
+	
+	// Register event callbacks
+	public void RegisterCallback (IOConnectEventCallback callback) {
+		connectCallback = callback;
+	}
+	
+	public void RegisterCallback(IODisconnectEventCallback callback) {
+		disconnectCallback = callback;
+	}
+	
+	public void RegisterCallback(IOReadEventCallback callback) {
+		readCallback = callback;
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void Start() throws IOException, UnknownHostException {
+		// Open selector
+		selector = Selector.open();
+		// Open server channel
+		serverSockChannel = ServerSocketChannel.open();
+		// Set server to not block
+		serverSockChannel.configureBlocking(false);
+		// Get the socked address object for localhost on the listening port
+		InetSocketAddress isa = new InetSocketAddress(InetAddress.getLocalHost(),this.port);
+		// Bind the server
+		serverSockChannel.socket().bind(isa);
+		
+		// Get the selection key for accepting
+		serverSockChannel.register(selector, SelectionKey.OP_ACCEPT);
+		// Wait for connections
+		while (selector.select() > 0) {
+			// Get the keys for new connections
+			Set readyKeys = selector.selectedKeys();
+			// Get the iterator for new connections
+			Iterator it = readyKeys.iterator();
+			
+			ParallelLoop.ForEach(it, new SelectIteratorCallback(), true);
+		}
+	}
+	
+	protected static void clientDisconnected(SnowTcpClient client) {
+		activeClients.remove(client.GetSelectionKey());
+		disconnectCallback.Invoke(client);
+	}
+	
+	private class SelectIteratorCallback implements IForEachCallback {
+
+		@Override
+		public <T> void Invoke(T item) throws IOException {
+			// Get the seleciton key for the current new connection
+			SelectionKey key = (SelectionKey)item;
+			
+			// If it's a good key
+			if (key.isAcceptable()) {
+				// Get the server channel
+				ServerSocketChannel ssc = (ServerSocketChannel)key.channel();
+				// Accept the connection
+				sockChannel = (SocketChannel)ssc.accept();
+				// set the socket to non-blocking
+				sockChannel.configureBlocking(false);
+				// Get read/write SelectionKey and register it with the selector
+				SelectionKey rw = sockChannel.register(selector,SelectionKey.OP_READ|SelectionKey.OP_WRITE);
+				// Create the client object
+				SnowTcpClient client = new SnowTcpClient(rw);
+				// Add client to client list
+				activeClients.put(rw, client);
+				// Invoke connect callback
+				connectCallback.Invoke(client);
+			}
+			
+			if (key.isReadable()) {
+				SnowTcpClient c = activeClients.get(key);
+				try {
+					readCallback.Invoke(c, c.Read());
+				} catch (IOException e) {
+					// This means the client disconnected. call disconnect callback
+					clientDisconnected(c);
+				}
+			}
+			
+			if (key.isWritable()) {
+				SnowTcpClient c = activeClients.get(key);
+				try {
+					c.writeBuffers();
+				} catch (IOException e) {
+					// This means the client disconnected. call disconnect callback
+					clientDisconnected(c);
+				}
+			}
+		}
+	}
+	
+}

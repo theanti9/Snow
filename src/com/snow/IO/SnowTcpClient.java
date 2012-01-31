@@ -12,6 +12,8 @@ public class SnowTcpClient {
 	private SocketChannel socket;
 	private ArrayList<ByteBuffer> toWrite;
 	
+	private String name;
+	
 	public SnowTcpClient(SelectionKey key) throws IOException {
 		this.selectionKey = key;
 		this.socket = (SocketChannel)this.selectionKey.channel();
@@ -48,4 +50,13 @@ public class SnowTcpClient {
 		socket.close();
 		SnowTcpServer.clientDisconnected(this);
 	}
+	
+	public void SetName(String n) {
+		this.name = n;
+	}
+	
+	public String GetName() {
+		return this.name;
+	}
+	
 }

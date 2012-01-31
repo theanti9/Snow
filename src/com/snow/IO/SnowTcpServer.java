@@ -31,9 +31,18 @@ public class SnowTcpServer {
 	private static HashMap<SelectionKey, SnowTcpClient> activeClients;
 	
 	private int port;
+	private int poolSize;
+	private int maxPoolSize;
+	private int queueSize;
+	private long keepAliveTime;
 	
-	public SnowTcpServer(int port) {
+	
+	public SnowTcpServer(int port, int poolSize, int maxPoolSize, int queueSize, long keepAliveTime) {
 		this.port = port;
+		this.poolSize = poolSize;
+		this.maxPoolSize = maxPoolSize;
+		this.queueSize = queueSize;
+		this.keepAliveTime = keepAliveTime;
 		activeClients = new HashMap<SelectionKey, SnowTcpClient>();
 	}
 	
@@ -62,16 +71,20 @@ public class SnowTcpServer {
 		InetSocketAddress isa = new InetSocketAddress(InetAddress.getLocalHost(),this.port);
 		// Bind the server
 		serverSockChannel.socket().bind(isa);
-		
 		// Get the selection key for accepting
 		serverSockChannel.register(selector, SelectionKey.OP_ACCEPT);
+		// Set parallel loop handler variables
+		ParallelLoop.PoolSize = this.poolSize;
+		ParallelLoop.MaxPoolSize = this.maxPoolSize;
+		ParallelLoop.QueueSize = this.queueSize;
+		ParallelLoop.KeepAliveTime = this.keepAliveTime;
 		// Wait for connections
 		while (selector.select() > 0) {
 			// Get the keys for new connections
 			Set readyKeys = selector.selectedKeys();
 			// Get the iterator for new connections
 			Iterator it = readyKeys.iterator();
-			
+			// Handle the selected items in parallel
 			ParallelLoop.ForEach(it, new SelectIteratorCallback(), true);
 		}
 	}

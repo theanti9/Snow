@@ -126,7 +126,7 @@ These can be changed before you call the ForEach method in order to adjust the o
 * `int QueueSize` - The size of the thread queue.
 * `long KeepAliveTime` - How long a thread should wait before it times out
 
-####orEach
+####ForEach
 This static function can be passed an iterator and a callback to use for each iteration which will be executed in a parallel thread pool
 
     public static <T> void ForEach(Iterator<T> it, final IForEachCallback callback, boolean remove)
@@ -137,3 +137,87 @@ Args:
 * `it` - The iterator to be iterated over
 * `callback` - The callback to be used on each item in the loop
 * `remove` *optional* - Marks whether to remove an item from the iterator after consuming it. default is `false`
+
+
+* * *
+
+## Callback Interfaces
+
+###IForEachCallback
+
+**Methods**
+
+    public <T> void Invoke(T item) throws Exception;
+
+Args:
+
+* `item` - This is the object that gets passed to the callback from the loop
+
+Usage Example:
+
+	Iterator it;
+
+	// Initialize it here
+
+    ParallelLoop.ForEach(it, new IForEachCallback() {
+    	public <T> void Invoke(T item) throws IOException {
+    		// code with your item here
+    	}
+	}, true);
+
+###IOConnectEventCallback
+
+**Methods**
+
+    public void Invoke(SnowTcpClient client);
+    
+Args:
+
+* `client` - The SnowTcpClient object representing the new connection
+
+Usage Example:
+
+    server.RegisterCallback(new IOConnectEventCallback() {
+		public void Invoke(SnowTcpClient client) {
+			// Set the name to the date string with no spaces.
+			client.SetName(client.getConnectionTime().toString().replace(" ", ""));
+    	}
+    });
+
+###IODisconnectEventCallback
+
+**Methods**
+
+    public void Invoke(SnowTcpClient client);
+    
+Args:
+
+* `client` - The SnowTcpClient object representing the disconnected client
+
+Usage Example:
+
+    server.RegisterCallback(new IODisconnectEventCallback() {
+    	public void Invoke(SnowTcpClient client) {
+    		// Do cleanup here
+    	}
+    });
+
+###IOReadEventCallback
+
+**Methods**
+
+    public void Invoke(SnowTcpClient client, byte[] buff);
+    
+Args:
+
+* `client` - The SnowTcpClient object representing the disconnected client
+* `buff` - the bytes read from the socket channel object as a byte array
+
+Usage Example:
+
+    server.RegisterCallback(new IOReadEventCallback() {
+    	public void Invoke(SnowTcpClient client, byte[] buff) {
+    		// return it to the client
+    		client.Write(buff);
+    	}
+    });

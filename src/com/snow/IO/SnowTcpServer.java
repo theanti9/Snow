@@ -1,7 +1,6 @@
 package com.snow.IO;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.channels.SelectionKey;
@@ -68,18 +67,19 @@ public class SnowTcpServer {
 		// Set server to not block
 		serverSockChannel.configureBlocking(false);
 		// Get the socked address object for localhost on the listening port
-		InetSocketAddress isa = new InetSocketAddress(InetAddress.getLocalHost(),this.port);
+		InetSocketAddress isa = new InetSocketAddress("0.0.0.0",this.port);
 		// Bind the server
 		serverSockChannel.socket().bind(isa);
 		// Get the selection key for accepting
-		serverSockChannel.register(selector, SelectionKey.OP_ACCEPT);
+		SelectionKey acceptKey = serverSockChannel.register(selector, SelectionKey.OP_ACCEPT);
+		System.out.println("LISTENING");
 		// Set parallel loop handler variables
 		ParallelLoop.PoolSize = this.poolSize;
 		ParallelLoop.MaxPoolSize = this.maxPoolSize;
 		ParallelLoop.QueueSize = this.queueSize;
 		ParallelLoop.KeepAliveTime = this.keepAliveTime;
 		// Wait for connections
-		while (selector.select() > 0) {
+		while (acceptKey.selector().select() > 0) {
 			// Get the keys for new connections
 			Set readyKeys = selector.selectedKeys();
 			// Get the iterator for new connections

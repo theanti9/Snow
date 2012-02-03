@@ -26,13 +26,17 @@ public class ParallelLoop {
 		while(true) {
 			// Get the next item
 			final T item = sit.NextOrNull();
-			if (remove == true) {
-				sit.remove();
-			}
-			// Break if we're done
+			
+			// Break if we're done			
 			if (item == null) {
 				break;
 			}
+			// Get rid of it if we're supposed to remove
+			if (remove == true) {
+				sit.remove();
+			}
+
+			
 			// Add to the pool
 			poolExecutor.execute(new Runnable() {
 				public void run() {

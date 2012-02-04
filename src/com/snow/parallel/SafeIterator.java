@@ -10,10 +10,6 @@ public class SafeIterator<T> {
 		this.in = in;
 	}
 	
-	public void remove() {
-		in.remove();
-	}
-	
 	public synchronized T NextOrNull() {
 		T out;
 		if (in.hasNext()) {

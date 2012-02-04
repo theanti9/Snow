@@ -85,7 +85,7 @@ public class SnowTcpServer {
 			// Get the iterator for new connections
 			Iterator it = readyKeys.iterator();
 			// Handle the selected items in parallel
-			ParallelLoop.ForEach(it, new SelectIteratorCallback(), true);
+			ParallelLoop.ForEach(it, new SelectIteratorCallback());
 		}
 	}
 	

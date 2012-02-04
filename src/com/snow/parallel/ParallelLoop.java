@@ -17,7 +17,7 @@ public class ParallelLoop {
 	private static final ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<Runnable>(QueueSize);
 	
 	// Pass this an iterator of anything and a callback to perform on each item
-	public static <T> void ForEach(Iterator<T> it, final IForEachCallback callback, boolean remove) {
+	public static <T> void ForEach(Iterator<T> it, final IForEachCallback callback) {
 		// Use the thread safe iterator
 		SafeIterator<T> sit = new SafeIterator<T>(it);
 		// Make the executor pool
@@ -31,12 +31,6 @@ public class ParallelLoop {
 			if (item == null) {
 				break;
 			}
-			// Get rid of it if we're supposed to remove
-			if (remove == true) {
-				sit.remove();
-			}
-
-			
 			// Add to the pool
 			poolExecutor.execute(new Runnable() {
 				public void run() {
@@ -44,14 +38,10 @@ public class ParallelLoop {
 					try {
 						callback.Invoke(item);
 					} catch (Exception e) {
-						// just let it exit
+						e.printStackTrace();
 					}
 				}
 			});
 		}
-	}
-	
-	public static <T> void ForEach(Iterator<T> it, final IForEachCallback callback) {
-		ForEach(it, callback, false);
 	}
 }

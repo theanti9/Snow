@@ -11,7 +11,7 @@ public class ParallelLoop {
 	public static int PoolSize = 2;
 	public static int MaxPoolSize = 10;
 	public static long KeepAliveTime = 10;
-	public static int QueueSize = 20;
+	public static int QueueSize = 50;
 	
 	private static ThreadPoolExecutor poolExecutor;
 	private static final ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<Runnable>(QueueSize);
@@ -43,5 +43,9 @@ public class ParallelLoop {
 				}
 			});
 		}
+	}
+	
+	public static void killRunningThreads() {
+		poolExecutor.shutdownNow();
 	}
 }

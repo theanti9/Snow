@@ -89,6 +89,16 @@ public class SnowTcpServer {
 		}
 	}
 	
+	public void Stop() throws IOException {
+		serverSockChannel.close();
+		sockChannel.close();
+		selector.close();
+		for (SnowTcpClient c : activeClients.values()) {
+			c.Disconnect();
+		}
+		ParallelLoop.killRunningThreads();
+	}
+	
 	protected static void clientDisconnected(SnowTcpClient client) {
 		activeClients.remove(client.GetSelectionKey());
 		disconnectCallback.Invoke(client);

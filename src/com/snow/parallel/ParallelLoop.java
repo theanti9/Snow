@@ -8,8 +8,8 @@ import java.util.concurrent.TimeUnit;
 public class ParallelLoop {
 	
 	// These can be changed before executing the loop
-	public static int PoolSize = 2;
-	public static int MaxPoolSize = 10;
+	public static int PoolSize = Runtime.getRuntime().availableProcessors()*10;
+	public static int MaxPoolSize = Runtime.getRuntime().availableProcessors()*25;
 	public static long KeepAliveTime = 10;
 	public static int QueueSize = 50;
 	

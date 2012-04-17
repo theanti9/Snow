@@ -43,6 +43,7 @@ public class ParallelLoop {
 				}
 			});
 		}
+		poolExecutor.shutdown();
 	}
 	
 	public static void killRunningThreads() {

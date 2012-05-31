@@ -36,7 +36,7 @@ public class SnowTcpClient {
 		return buf.array();
 	}
 	
-	public void Write(byte[] bytes) throws IOException {
+	public synchronized void Write(byte[] bytes) throws IOException {
 		this.selectionKey = socket.register(selector, SelectionKey.OP_WRITE);
 		ByteBuffer buf = ByteBuffer.allocate(bytes.length);
 		buf = ByteBuffer.wrap(bytes);

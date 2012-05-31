@@ -11,7 +11,7 @@ public class ParallelLoop {
 	public static int PoolSize = Runtime.getRuntime().availableProcessors()*10;
 	public static int MaxPoolSize = Runtime.getRuntime().availableProcessors()*25;
 	public static long KeepAliveTime = 10;
-	public static int QueueSize = 50;
+	public static int QueueSize = 1000;
 	
 	private static ThreadPoolExecutor poolExecutor;
 	private static final ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<Runnable>(QueueSize);

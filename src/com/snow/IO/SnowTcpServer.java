@@ -14,7 +14,7 @@ import java.util.Set;
 import com.snow.IO.EventCallback.IOConnectEventCallback;
 import com.snow.IO.EventCallback.IODisconnectEventCallback;
 import com.snow.IO.EventCallback.IOReadEventCallback;
-import com.snow.parallel.IForEachCallback;
+//import com.snow.parallel.IForEachCallback;
 import com.snow.parallel.ParallelLoop;
 
 public class SnowTcpServer {
@@ -60,7 +60,7 @@ public class SnowTcpServer {
 		readCallback = callback;
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	public void Start() throws IOException, UnknownHostException {
 		// Open selector
 		selector = Selector.open();
@@ -161,7 +161,6 @@ public class SnowTcpServer {
 			sockChannel.close();
 			selector.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
